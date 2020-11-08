@@ -1,19 +1,23 @@
 package ru.mirea.GUI;
 
+import jdk.jfr.Event;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class gui_interface {
+public class GUI_interface {
 
 
     static class task extends JFrame
     {
+        JTextArea area1;
         private  final  String[][]  menuFile =
                 {{"Файл"     ,  "Ф",  "", ""},
+                        {"Новый", "Н", "N", ""},
                         {"Открыть"  ,  "О", "O", ""},
                         {"Сохранить",  "С", "S", ""},
-                        {"Сохранить как", "С", "ctrl+S", ""}};
+                        {"Сохранить как", "shift S", "shift S", ""}};
 
         private JMenu createMenuItems(final String[][] items)
         {
@@ -23,59 +27,35 @@ public class gui_interface {
             for (int i = 1; i < items.length; i++) {
                 // пункт меню "Открыть"
                 JMenuItem item = new JMenuItem(items[i][0]);
+//                KeyStroke ctrlNKeyStroke = KeyStroke.getKeyStroke("control N");
                 item.setMnemonic(items[i][1].charAt(0)); // русская буква
                 // установим клавишу быстрого доступа (латинская буква)
-                item.setAccelerator(KeyStroke.getKeyStroke(items[i][2].charAt(0)));
+                item.setAccelerator(KeyStroke.getKeyStroke("control "+items[i][2]));
                 if (item.getText()=="Открыть")
-                    fileChooserCreation(item);
+                    GUI_actions.fileChooserCreation(item, task.this, area1);
+                if (item.getText()=="Новый")
+                    GUI_actions.createNewTxt(item, task.this);
+                if (item.getText()=="Сохранить")
+                    GUI_actions.saveChanges(item, area1);
+                if (item.getText()=="Сохранить как")
+                    GUI_actions.saveAs(item, area1, task.this);
                 if (items[i][3].length() > 0)
                     item.setIcon(new ImageIcon(items[i][3]));
                 menu.add(item);
             }
             return menu;
         }
-        void fileChooserCreation(JMenuItem menuItem){
-            JFileChooser fileChooser = new JFileChooser();
-            menuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    fileChooser.setDialogTitle("Выбор файла");
-                    int result = fileChooser.showOpenDialog(task.this);
-                    // Если директория выбрана, покажем ее в сообщении
-//                    if (result == JFileChooser.APPROVE_OPTION )
-//                        JOptionPane.showMessageDialog(task.this, fileChooser.getSelectedFile());
-                }
-            });
-        }
-//        private JMenu createSubmenus()
-//        {
-//            JMenu text = new JMenu("Текст");
-//            // и несколько вложенных меню
-//            JMenu style = new JMenu("Стиль");
-//            JMenuItem bold = new JMenuItem("Жирный");
-//            JMenuItem italic = new JMenuItem("Курсив");
-//            JMenu font = new JMenu("Шрифт");
-//            JMenuItem arial = new JMenuItem("Arial");
-//            JMenuItem times = new JMenuItem("Times");
-//            font.add(arial); font.add(times);
-//            // размещаем все в нужном порядке
-//            style.add(bold);
-//            style.add(italic);
-//            style.addSeparator();
-//            style.add(font);
-//            text.add(style);
-//            return text;
-//        }
+
         task() {
             super("Basic_GUI");
             setLayout(null);
 
             // Cоздание многострочных полей
-            JTextArea area1 = new JTextArea(35, 100);
+            area1 = new JTextArea(35, 100);
             // Шрифт и табуляция
             area1.setFont(new Font("Dialog", Font.PLAIN, 14));
             area1.setLineWrap(true);
             area1.setWrapStyleWord(true);
-
             // создаем строку главного меню
             JMenuBar menuBar = new JMenuBar();
             // Создание меню "Файл"
